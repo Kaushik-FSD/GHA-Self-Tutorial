@@ -1,0 +1,48 @@
+name: Env Scoping Demo
+
+on:
+  push:
+    branches: [master]
+
+# ── LEVEL 1: Workflow-level ────────────────────────────────────────────
+# Available to ALL jobs and ALL steps in this file
+env:
+  APP_NAME: ledgerpay
+  JAVA_VERSION: '21'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # ── LEVEL 2: Job-level ──────────────────────────────────────────────
+    # Overrides workflow-level if same key. Only available within this job.
+    env:
+      ENVIRONMENT: staging        # job-level
+      APP_NAME: ledgerpay-build   # overrides workflow-level APP_NAME for this job only
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show scope
+        # ── LEVEL 3: Step-level ─────────────────────────────────────────
+        # Overrides job and workflow level. Only for this step.
+        env:
+          APP_NAME: ledgerpay-step   # overrides again, only this step
+          STEP_ONLY: "I exist only here"
+        run: |
+          echo "$APP_NAME"      # ledgerpay-step  (step wins)
+          echo "$ENVIRONMENT"   # staging         (job-level, still visible)
+          echo "$STEP_ONLY"     # works fine
+
+      - name: Next step
+        run: |
+          echo "$APP_NAME"      # ledgerpay-build  (back to job-level)
+          echo "$STEP_ONLY"     # empty string — gone after previous step ended
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Different job
+        run: |
+          echo "$APP_NAME"      # ledgerpay  (workflow-level, no override in this job)
+          echo "$ENVIRONMENT"   # empty — job-level from 'build' job is NOT visible here

@@ -1,0 +1,52 @@
+name: Runners Demo
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+
+  # ── GitHub-hosted runners ─────────────────────────────────────────────
+  # Fresh VM every run. No maintenance. You pay by the minute (free tier: 2000 min/month)
+  linux-job:
+    runs-on: ubuntu-latest          # Ubuntu 22.04 — most common, cheapest
+    steps:
+      - run: echo "Linux runner"
+
+  windows-job:
+    runs-on: windows-latest         # 2x cost multiplier vs Linux
+    steps:
+      - run: echo "Windows runner"
+
+  mac-job:
+    runs-on: macos-latest           # 10x cost multiplier vs Linux — avoid unless needed
+    steps:
+      - run: echo "Mac runner"
+
+  # ── Specific versions (avoid -latest in prod — it rolls forward automatically) ──
+  pinned-job:
+    runs-on: ubuntu-22.04           # pin to specific OS version for stability
+    steps:
+      - run: echo "Pinned Ubuntu"
+
+  # ── Self-hosted runners ───────────────────────────────────────────────
+  # This is your Jenkins agent equivalent
+  # You install the runner agent on your own machine/VM/container
+  # Then reference it by labels you define during setup
+  self-hosted-job:
+    runs-on: [self-hosted, linux, X64]   # array of labels — runner must match ALL
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          echo "Running on our own infra"
+          echo "Has access to internal network, internal Maven repo, etc."
+
+  # ── Label matching strategy ───────────────────────────────────────────
+  # If you register a runner with labels: [self-hosted, linux, production, high-memory]
+  # A job with runs-on: [self-hosted, production] will match it
+  # A job with runs-on: [self-hosted, windows] will NOT match it
+  deploy-prod:
+    runs-on: [self-hosted, production]
+    steps:
+      - run: echo "Only runs on runners tagged 'production'"
