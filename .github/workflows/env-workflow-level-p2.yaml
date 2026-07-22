@@ -3,6 +3,9 @@ name: Env Scoping Demo
 on:
   push:
     branches: [master]
+    paths:
+      - 'src/**'            # only run if something inside src/ changed
+      - '!src/**/*.md'
 
 # ── LEVEL 1: Workflow-level ────────────────────────────────────────────
 # Available to ALL jobs and ALL steps in this file

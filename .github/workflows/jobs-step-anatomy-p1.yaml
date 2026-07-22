@@ -3,6 +3,9 @@ name: Job & Step Anatomy
 on:
   push:
     branches: [master]
+    paths:
+      - 'src/**'            # only run if something inside src/ changed
+      - '!src/**/*.md'
 
 jobs:
 
