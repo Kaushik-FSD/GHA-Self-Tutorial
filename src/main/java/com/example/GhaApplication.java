@@ -5,8 +5,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GhaPhase1Application {
+public class GhaApplication {
     public static void main(String[] args) {
-        SpringApplication.run(GhaPhase1Application.class, args);
+        SpringApplication.run(GhaApplication.class, args);
     }
 }
