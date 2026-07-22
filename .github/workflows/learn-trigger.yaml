@@ -5,7 +5,7 @@ name: Learn Triggers
 on:
   push:
     branches:
-      - main
+      - master
       - 'release/**'        # glob: matches release/1.0, release/v2, etc.
     paths:
       - 'src/**'            # only run if something inside src/ changed
@@ -13,7 +13,7 @@ on:
 
   pull_request:
     branches:
-      - main                # only PRs targeting main
+      - master                # only PRs targeting master
     types:
       - opened              # PR created
       - synchronize         # new commits pushed to the PR branch
