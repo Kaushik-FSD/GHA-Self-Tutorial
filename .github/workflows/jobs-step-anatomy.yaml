@@ -54,3 +54,38 @@ jobs:
           name: app-jar
           path: target/*.jar
           retention-days: 7
+
+      # GitHub Context (Built-in Variables)
+      - name: Print GitHub context
+        env:
+          # ── github context ─────────────────────────────────────
+          EVENT:     ${{ github.event_name }}    # push / pull_request / workflow_dispatch
+          BRANCH:    ${{ github.ref_name }}      # main  (short form, no refs/heads/)
+          FULL_REF:  ${{ github.ref }}           # refs/heads/main
+          SHA:       ${{ github.sha }}           # full 40-char commit SHA
+          RUN_NUM:   ${{ github.run_number }}    # auto-incrementing integer (like BUILD_NUMBER)
+          RUN_ID:    ${{ github.run_id }}        # unique ID for this specific run
+          ACTOR:     ${{ github.actor }}         # GitHub username who triggered
+          REPO:      ${{ github.repository }}    # owner/repo-name
+          WORKSPACE: ${{ github.workspace }}     # /home/runner/work/repo/repo (checked out code)
+
+          # ── runner context ─────────────────────────────────────
+          RUNNER_OS:   ${{ runner.os }}          # Linux / Windows / macOS
+          RUNNER_ARCH: ${{ runner.arch }}        # X64 / ARM64
+          
+        run: |
+          echo "Event     : $EVENT"
+          echo "Branch    : $BRANCH"
+          echo "SHA       : $SHA"
+          echo "Run #     : $RUN_NUM"
+          echo "Actor     : $ACTOR"
+          echo "Workspace : $WORKSPACE"
+
+      # ── Practical pattern: Docker image tagging ────────────────
+
+      - name: Build Docker image with meaningful tag
+        run: |
+          SHORT_SHA=$(git rev-parse --short HEAD)   # GHA has no built-in short SHA
+          IMAGE_TAG="${{ github.ref_name }}-${SHORT_SHA}"
+          echo "Tag: $IMAGE_TAG"      # e.g. main-a1b2c3d
+          # docker build -t myapp:$IMAGE_TAG .   ← real usage in Phase 3
