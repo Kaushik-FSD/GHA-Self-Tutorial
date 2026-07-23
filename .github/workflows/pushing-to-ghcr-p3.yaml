@@ -3,9 +3,9 @@ name: Phase 3 - Build & Push to GHCR
 on:
   push:
     branches: [master]
-    # paths:
-    #   - 'src/**'
-    #   - '!src/**/*.md'
+    paths:
+      - 'src/**'
+      - '!src/**/*.md'
 
 env:
   # ghcr.io/{github-username}/{image-name}

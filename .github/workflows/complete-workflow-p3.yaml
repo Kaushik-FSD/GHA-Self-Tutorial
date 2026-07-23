@@ -1,0 +1,52 @@
+name: GHCR complete workflow
+
+on:
+  push: 
+    branches: [master]
+    # paths:
+    #   - 'src/**'
+    #   - '!src/**/*.md'
+
+jobs:
+  docker-build-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: setup java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      
+      - name: Build jar with mvn and skip tests
+        run: mvn clean package -DskipTests
+      
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push to ghcr registry
+        uses: docker/build-push-action@v5
+        with:
+          context: .           # build context = repo root (where Dockerfile is)
+          push: true           # actually push to registry (set false to just build)
+          tags: |
+            latest
+            ${{ github.branch }}:${{ github.run_number }}
+          
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      
