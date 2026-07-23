@@ -2,9 +2,7 @@
 # STAGE 1: "builder" — the kitchen where cooking happens
 # This stage exists only to compile. It gets thrown away after.
 # ══════════════════════════════════════════════════════════════════════
-FROM eclipse-temurin:21-jdk-alpine AS builder
-# ↑ JDK — needs compiler                  ↑ name this stage
-
+FROM maven:3.9-eclipse-temurin-21 AS builder
 WORKDIR /app
 
 # Cache deps layer separately from source (cache trick from Topic 2)
