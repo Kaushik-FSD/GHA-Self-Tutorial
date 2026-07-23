@@ -37,6 +37,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Lowercase image name
+        id: image
+        run: echo "name=ghcr.io/${OWNER,,}/gha-tutorial" >> $GITHUB_OUTPUT
+        env:
+          OWNER: ${{ github.repository_owner }}
+        # ${OWNER,,} is bash syntax for lowercase conversion
+
       # ── Build and Push ─────────────────────────────────────────────
       - name: Build and push to ghcr registry
         uses: docker/build-push-action@v5
@@ -46,8 +53,8 @@ jobs:
           
           # Multiple tags for the same image — common production pattern
           tags: |
-            ${{ env.IMAGE_NAME }}:latest
-            ${{ env.IMAGE_NAME }}:${{ github.run_number }}
+            ${{ steps.image.outputs.name }}:latest
+            ${{ steps.image.outputs.name }}:${{ github.run_number }}
           
           # Cache layers using GitHub's cache — speeds up repeat builds in CI
           cache-from: type=gha
