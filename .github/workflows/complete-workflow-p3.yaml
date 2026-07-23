@@ -3,9 +3,9 @@ name: GHCR complete workflow
 on:
   push: 
     branches: [master]
-    # paths:
-    #   - 'src/**'
-    #   - '!src/**/*.md'
+    paths:
+      - 'src/**'
+      - '!src/**/*.md'
 
 jobs:
   docker-build-push:
@@ -49,7 +49,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
+          push: ${{ github.ref_name == 'master' }}  # only push on master branch
           # Full format: ghcr.io/owner/image-name:tag
           tags: |
             ${{ steps.image.outputs.name }}:latest
