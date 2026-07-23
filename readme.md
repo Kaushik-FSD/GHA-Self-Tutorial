@@ -48,3 +48,34 @@ docker push → GHCR         ← uploads image to registry (publish step)
 kubectl apply / docker run ← pulls image from registry and RUNS it (deploy step)
    on your actual server
 ```
+
+### Q4 - The github tags names
+
+```
+EVENT:     ${{ github.event_name }}    # push / pull_request / workflow_dispatch
+BRANCH:    ${{ github.ref_name }}      # main  (short form, no refs/heads/)
+FULL_REF:  ${{ github.ref }}           # refs/heads/main
+SHA:       ${{ github.sha }}           # full 40-char commit SHA
+RUN_NUM:   ${{ github.run_number }}    # auto-incrementing integer (like BUILD_NUMBER)
+RUN_ID:    ${{ github.run_id }}        # unique ID for this specific run
+ACTOR:     ${{ github.actor }}         # GitHub username who triggered
+REPO:      ${{ github.repository }}    # owner/repo-name
+WORKSPACE: ${{ github.workspace }}     # /home/runner/work/repo/repo (checked out code)
+
+# ── runner context ─────────────────────────────────────
+RUNNER_OS:   ${{ runner.os }}          # Linux / Windows / macOS
+RUNNER_ARCH: ${{ runner.arch }}        # X64 / ARM64
+```
+
+### Q5 - Jenkins → GHA variable mapping:
+
+```
+Jenkins	                GHA
+BUILD_NUMBER	        github.run_number
+GIT_BRANCH	            github.ref_name
+GIT_COMMIT	            github.sha
+JOB_NAME	            github.workflow
+WORKSPACE	            github.workspace
+currentBuild.result	    job.status (in if: conditions)
+BUILD_URL	            construct from github.server_url/github.repository/actions/runs/github.run_id
+```

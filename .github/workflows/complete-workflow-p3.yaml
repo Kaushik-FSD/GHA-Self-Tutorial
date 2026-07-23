@@ -45,7 +45,7 @@ jobs:
           push: true           # actually push to registry (set false to just build)
           tags: |
             latest
-            ${{ github.branch }}:${{ github.run_number }}
+            ${{ github.ref_name }}:${{ github.run_number }}
           
           cache-from: type=gha
           cache-to: type=gha,mode=max
