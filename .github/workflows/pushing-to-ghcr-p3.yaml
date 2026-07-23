@@ -1,0 +1,59 @@
+name: Phase 3 - Build & Push to GHCR
+
+on:
+  push:
+    branches: [master]
+    # paths:
+    #   - 'src/**'
+    #   - '!src/**/*.md'
+
+env:
+  # ghcr.io/{github-username}/{image-name}
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/gha-tutorial
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    # Required permissions for GITHUB_TOKEN to push to GHCR
+    permissions:
+      contents: read
+      packages: write    # ← this is what allows pushing to GHCR
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── Login to GHCR using the automatic GITHUB_TOKEN ────────────
+      # No secrets to create. GitHub provides GITHUB_TOKEN for free.
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}   # automatic, no setup needed
+
+      # ── Setup BuildKit (faster builds, required for multi-stage) ──
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ── Build and Push ─────────────────────────────────────────────
+      - name: Build and push to ghcr registry
+        uses: docker/build-push-action@v5
+        with:
+          context: .           # build context = repo root (where Dockerfile is)
+          push: true           # actually push to registry (set false to just build)
+          
+          # Multiple tags for the same image — common production pattern
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.run_number }}
+          
+          # Cache layers using GitHub's cache — speeds up repeat builds in CI
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+          #One thing to note about cache-from: type=gha — this is GHA's built-in layer cache. It's the CI equivalent of having a warm .m2 cache. First run downloads everything. Subsequent runs pull from cache. Cuts your Docker build time significantly.
+
+# Push = publish to a registry. The image is sitting in GHCR. Nothing is running anywhere.
+# Deploy = take that image from the registry and run it on a server, Kubernetes cluster, ECS, etc.

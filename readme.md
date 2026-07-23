@@ -26,3 +26,25 @@ env:
 
 Jenkins Agent = a worker machine that the Jenkins master sends jobs to. Your Jenkins master doesn't run builds itself — it delegates to agents (also called nodes/slaves in older Jenkins). Each agent can have labels like linux, java21, prod-network.
 GHA Self-hosted Runner = exact same concept, different name. You install a small runner process on your own machine. GitHub's servers delegate job execution to it. You assign labels during setup. Job says runs-on: [self-hosted, linux] → GitHub finds a matching runner.
+
+### Q3 - Is push the same as deploy?
+
+No. Completely different things.
+Here's the full journey of a Docker image:
+
+```
+Your Code
+    │
+    ▼
+mvn clean package          ← builds the JAR (compile step)
+    │
+    ▼
+docker build               ← packages JAR into an image (build step)
+    │
+    ▼
+docker push → GHCR         ← uploads image to registry (publish step)
+    │
+    ▼
+kubectl apply / docker run ← pulls image from registry and RUNS it (deploy step)
+   on your actual server
+```
